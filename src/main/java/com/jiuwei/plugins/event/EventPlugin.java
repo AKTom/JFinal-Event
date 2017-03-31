@@ -25,11 +25,12 @@ public class EventPlugin implements IPlugin {
 	private String scanPackage = "com";
 
 	public EventPlugin() {};
-
-	public EventPlugin(String scanPackage) {
+	
+	public EventPlugin setScanPackage(String scanPackage){
 		this.scanPackage = scanPackage;
+		return this;
 	}
-
+	
 	/**
 	 * @Description TODO
 	 * @example TODO

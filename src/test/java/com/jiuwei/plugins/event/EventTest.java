@@ -29,7 +29,7 @@ public class EventTest {
 	 * @name com.jiuwei.backstage.base.event.Test.main
 	 */
 	public static void main(String[] args) {
-		IPlugin plugin = new EventPlugin();
+		IPlugin plugin = new EventPlugin().setScanPackage("com.jiuwei");
 		plugin.start();
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("phone", "15816825241");

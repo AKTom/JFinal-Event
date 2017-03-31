@@ -10,6 +10,9 @@ package com.jiuwei.plugins.event.listener;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jiuwei.plugins.event.annotation.Listener;
 import com.jiuwei.plugins.event.core.ApplicationListener;
 import com.jiuwei.plugins.event.entity.TestEvent;
@@ -19,9 +22,9 @@ import com.jiuwei.plugins.event.entity.TestEvent;
  * @param <E>
  * 
  */
-@Listener(enableAsync=false)
-public class TestApplicationListener implements
-		ApplicationListener<TestEvent> {
+@Listener(enableAsync = false,order=1)
+public class Test2ApplicationListener implements ApplicationListener<TestEvent> {
+	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * @Description TODO
@@ -29,13 +32,16 @@ public class TestApplicationListener implements
 	 * @param event
 	 * @author cpthack
 	 * @date 2016年10月11日 上午12:02:19
-	 * @name com.jiuwei.backstage.base.event.ApplicationListener<TestEvent>.onApplicationEvent
+	 * @name com.jiuwei.backstage.base.event.ApplicationListener<TestEvent>.
+	 *       onApplicationEvent
 	 */
 	@Override
 	public void onApplicationEvent(TestEvent event) {
-		System.out.println("监听到事件，我应该做点什么呢？");
-		Map<String, Object> paramsMap=(Map<String, Object>) event.getSource();
-		System.out.println("收到的信息有:"+paramsMap.get("phone"));
+		logger.debug("我是【" + event.getClass() + "】的事件监听器-2>>>"
+				+ this.getClass());
+		logger.debug("监听到事件，我应该做点什么呢？");
+		Map<String, Object> paramsMap = (Map<String, Object>) event.getSource();
+		logger.debug("收到的信息有:" + paramsMap.get("phone"));
 	}
 
 }

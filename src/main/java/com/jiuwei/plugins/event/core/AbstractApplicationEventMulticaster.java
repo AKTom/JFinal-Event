@@ -10,7 +10,10 @@ package com.jiuwei.plugins.event.core;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +28,7 @@ import com.jiuwei.plugins.event.utils.ClassHelper;
  */
 public abstract class AbstractApplicationEventMulticaster implements
 		ApplicationEventMulticaster {
-	
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private ArrayListMultimap<Type, ListenerHelper> listeners;
@@ -45,6 +48,7 @@ public abstract class AbstractApplicationEventMulticaster implements
 	 *       com.jiuwei.backstage.base.event.AbstractApplicationEventMulticaster.
 	 *       addApplicationListener
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 	@Override
 	public void addApplicationListener(Class<?> clazz2) {
 		Class<? extends ApplicationListener> clazz = (Class<? extends ApplicationListener>) clazz2;
@@ -63,7 +67,7 @@ public abstract class AbstractApplicationEventMulticaster implements
 			listeners = ArrayListMultimap.create();
 		}
 
-		listeners.put(type, new ListenerHelper(listener, enableAsync));
+		listeners.put(type, new ListenerHelper(listener, enableAsync, order));
 		logger.debug("add>>tppe=" + type + ">>>listener=" + listener.getClass());
 	}
 
@@ -80,7 +84,6 @@ public abstract class AbstractApplicationEventMulticaster implements
 	@Override
 	public void removeApplicationListener(ListenerHelper listener) {
 		System.out.println("it's no finishes.");
-
 	}
 
 	/**
@@ -102,15 +105,20 @@ public abstract class AbstractApplicationEventMulticaster implements
 	 * @example TODO
 	 * @return
 	 * @author cpthack
+	 * @param <T>
 	 * @date 2016年10月12日 上午1:25:49
 	 * @name 
 	 *       com.jiuwei.backstage.base.event.AbstractApplicationEventMulticaster.
 	 *       getApplicationListeners
 	 */
-	public List<ListenerHelper> getApplicationListeners(ApplicationEvent event) {
+	public Collection<ListenerHelper> getApplicationListeners(ApplicationEvent event) {
 		Type type = event.getClass();
 		logger.debug("getApplicationListeners>>>type=" + type);
-		return listeners.get(type);
+		Map<Integer,ListenerHelper> listenerHelperMap = new TreeMap<Integer,ListenerHelper>();
+		for(ListenerHelper listenerHelper:listeners.get(type)){
+			listenerHelperMap.put(listenerHelper.getOrder(),listenerHelper);
+		}
+		return listenerHelperMap.values();
 	}
 
 }

@@ -42,7 +42,7 @@ public class SimpleApplicationEventMulticaster extends
 	public void multicastEvent(final ApplicationEvent event) {
 		Executor executor = getTaskExecutor();
 		for (final ListenerHelper listener : getApplicationListeners(event)) {
-			logger.debug("doing applicationListener>>>listener=" + listener);
+			logger.debug("Doing ApplicationListener >>>" + listener.getListener().getClass());
 			if (listener.isEnableAsync()) {// 异步执行
 				if (executor != null) {
 					executor.execute(new Runnable() {

@@ -31,7 +31,7 @@ public class EventTest {
 	public static void main(String[] args) {
 		IPlugin plugin = new EventPlugin();
 		plugin.start();
-		Map<String, Object> params=new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("phone", "15816825241");
 		EventKit.post(new TestEvent(params));
 

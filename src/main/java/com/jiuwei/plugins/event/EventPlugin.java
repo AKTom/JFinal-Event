@@ -22,6 +22,14 @@ import com.jiuwei.plugins.event.utils.ClassUtil;
  */
 public class EventPlugin implements IPlugin {
 
+	private String scanPackage = "com";
+
+	public EventPlugin() {};
+
+	public EventPlugin(String scanPackage) {
+		this.scanPackage = scanPackage;
+	}
+
 	/**
 	 * @Description TODO
 	 * @example TODO
@@ -32,19 +40,18 @@ public class EventPlugin implements IPlugin {
 	 */
 	@Override
 	public boolean start() {
-		Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper("com", true,
-				ApplicationListener.class);
+		Set<Class<?>> clazzSet = ClassUtil.scanPackageBySuper(scanPackage,
+				true, ApplicationListener.class);
 		AbstractApplicationEventMulticaster applicationEventMulticaster = new SimpleApplicationEventMulticaster();
-		
+
 		for (Class<?> clazz : clazzSet) {
-			
-			applicationEventMulticaster
-					.addApplicationListener(clazz);
+
+			applicationEventMulticaster.addApplicationListener(clazz);
 		}
-		
+
 		EventKit eventKit = new EventKit();
 		eventKit.setApplicationEventMulticaster(applicationEventMulticaster);
-		
+
 		return true;
 	}
 

@@ -22,7 +22,7 @@ import com.jiuwei.plugins.event.entity.TestEvent;
  * @param <E>
  * 
  */
-@Listener(enableAsync = false,order=0)
+@Listener(enableAsync = false,order=3)
 public class Test1ApplicationListener implements ApplicationListener<TestEvent> {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

@@ -11,14 +11,13 @@ package com.jiuwei.plugins.event.core;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.jiuwei.plugins.event.annotation.Listener;
 import com.jiuwei.plugins.event.utils.ClassHelper;
 
@@ -31,10 +30,11 @@ public abstract class AbstractApplicationEventMulticaster implements
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private ArrayListMultimap<Type, ListenerHelper> listeners;
+	private static Map<Type, Map<String,ListenerHelper>> listeners;
 
+	@SuppressWarnings("static-access")
 	protected void setListeners(
-			ArrayListMultimap<Type, ListenerHelper> listeners) {
+			Map<Type, Map<String,ListenerHelper>> listeners) {
 		this.listeners = listeners;
 	}
 
@@ -50,7 +50,7 @@ public abstract class AbstractApplicationEventMulticaster implements
 	 */
 	@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 	@Override
-	public void addApplicationListener(Class<?> clazz2) {
+	public synchronized void addApplicationListener(Class<?> clazz2) {
 		Class<? extends ApplicationListener> clazz = (Class<? extends ApplicationListener>) clazz2;
 		Type type = ((ParameterizedType) clazz.getGenericInterfaces()[0])
 				.getActualTypeArguments()[0];
@@ -64,11 +64,25 @@ public abstract class AbstractApplicationEventMulticaster implements
 		ApplicationListener listener = ClassHelper.newInstance(clazz);
 
 		if (listeners == null) {
-			listeners = ArrayListMultimap.create();
+			listeners = new ConcurrentHashMap<Type, Map<String,ListenerHelper>>();
 		}
-
-		listeners.put(type, new ListenerHelper(listener, enableAsync, order));
-		logger.debug("add>>tppe=" + type + ">>>listener=" + listener.getClass());
+		
+		Map<String,ListenerHelper> listenerHelperMap = listeners.get(type);
+		if(listenerHelperMap==null){
+			listenerHelperMap = new TreeMap<String,ListenerHelper>();
+		}
+		
+		String listenerHelperMapKey=order+""+listener.getClass().getName();
+		System.out.println(listenerHelperMapKey);
+		if(!listenerHelperMap.containsKey(listenerHelperMapKey)){
+			listenerHelperMap.put(listenerHelperMapKey, new ListenerHelper(listener, enableAsync, order));
+			logger.debug("Add Type=" + type + ", The Listener is " + listener.getClass());
+		}
+		else{
+			logger.warn("Find Type="+type+" Add Repeat!");
+		}
+		
+		listeners.put(type,listenerHelperMap);
 	}
 
 	/**
@@ -113,12 +127,8 @@ public abstract class AbstractApplicationEventMulticaster implements
 	 */
 	public Collection<ListenerHelper> getApplicationListeners(ApplicationEvent event) {
 		Type type = event.getClass();
-		logger.debug("getApplicationListeners>>>type=" + type);
-		Map<Integer,ListenerHelper> listenerHelperMap = new TreeMap<Integer,ListenerHelper>();
-		for(ListenerHelper listenerHelper:listeners.get(type)){
-			listenerHelperMap.put(listenerHelper.getOrder(),listenerHelper);
-		}
-		return listenerHelperMap.values();
+		logger.debug("GetApplicationListeners By Type is" + type);
+		return listeners.get(type).values();
 	}
 
 }
